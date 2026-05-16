@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Hearth</title>
+<meta name="theme-color" content="#6E2A2A">
+<meta name="description" content="Where your family's daily rhythms live.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Hearth">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5EEE0;
+    --parchment: #EFE6D2;
+    --parchment-deep: #E5D9BD;
+    --ink: #2B1F18;
+    --ink-soft: #5A4636;
+    --wine: #6E2A2A;
+    --wine-deep: #4A1717;
+    --rose: #C97B6B;
+    --gold: #B08A3E;
+    --moss: #5E6B43;
+    --moss-soft: #8FA06D;
+    --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --sans: 'Manrope', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--sans);
+    overscroll-behavior-y: contain;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background:
+      radial-gradient(circle at 18% 8%, rgba(192, 138, 62, 0.08), transparent 45%),
+      radial-gradient(circle at 82% 92%, rgba(110, 42, 42, 0.07), transparent 45%),
+      var(--cream);
+    background-attachment: fixed;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    pointer-events: none; opacity: 0.6; z-index: 0;
+  }
+  #app {
+    position: relative; z-index: 1;
+    max-width: 560px; margin: 0 auto;
+    padding: 2rem 1.25rem calc(2rem + env(safe-area-inset-bottom));
+    min-height: 100vh; min-height: 100dvh;
+  }
+
+  /* Typography */
+  h1, h2, h3 { font-family: var(--serif); font-weight: 500; color: var(--ink); margin: 0; }
+  .display { font-size: 2.5rem; color: var(--wine); font-variation-settings: "opsz" 144; letter-spacing: -0.015em; }
+  .h-section { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--wine); font-weight: 600; }
+  .italic-serif { font-family: var(--serif); font-style: italic; color: var(--ink-soft); }
+
+  /* Fleuron divider */
+  .fleuron {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; color: var(--gold); opacity: 0.75; margin: 14px 0;
+  }
+  .fleuron::before, .fleuron::after {
+    content: ""; height: 1px; flex: 1; max-width: 80px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--sans); font-weight: 500; font-size: 0.95rem;
+    letter-spacing: 0.01em; padding: 0.85rem 1.25rem;
+    border-radius: 10px; cursor: pointer; transition: all 0.2s;
+    border: 1px solid transparent; text-decoration: none; color: inherit;
+    min-height: 48px;
+  }
+  .btn-primary {
+    background: var(--wine); color: var(--cream);
+    box-shadow: 0 4px 14px -4px rgba(110, 42, 42, 0.5);
+  }
+  .btn-primary:active { background: var(--wine-deep); transform: scale(0.98); }
+  .btn-ghost {
+    background: transparent; color: var(--ink-soft);
+    border-color: rgba(43, 31, 24, 0.18);
+  }
+  .btn-ghost:active { background: rgba(43, 31, 24, 0.06); }
+  .btn-full { width: 100%; }
+  .btn-icon {
+    background: transparent; border: none; cursor: pointer;
+    padding: 8px; color: var(--ink-soft);
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; transition: background 0.2s;
+  }
+  .btn-icon:active { background: rgba(43, 31, 24, 0.08); }
+
+  /* Header */
+  .app-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.25rem;
+  }
+  .app-header .title {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 1.6rem; color: var(--wine);
+    font-variation-settings: "opsz" 144;
+  }
+  .app-header .date {
+    font-family: var(--serif); font-style: italic;
+    color: var(--ink-soft); font-size: 0.85rem;
+  }
+
+  /* AM/PM toggle */
+  .toggle-group {
+    display: flex; background: var(--parchment);
+    border: 1px solid rgba(43, 31, 24, 0.1);
+    border-radius: 12px; padding: 4px;
+    margin-bottom: 1.5rem;
+  }
+  .toggle-btn {
+    flex: 1; padding: 0.75rem; background: transparent; border: none;
+    font-family: var(--sans); font-size: 0.95rem; font-weight: 500;
+    color: var(--ink-soft); cursor: pointer; border-radius: 8px;
+    transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .toggle-btn.active {
+    background: var(--cream); color: var(--wine);
+    box-shadow: 0 2px 6px -2px rgba(43, 31, 24, 0.2);
+    font-weight: 600;
+  }
+
+  /* Family grid */
+  .family-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .member-card {
+    background: var(--parchment);
+    border: 1px solid rgba(110, 42, 42, 0.12);
+    border-radius: 16px;
+    padding: 1rem 0.85rem 0.9rem;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.4) inset,
+      0 6px 18px -8px rgba(43, 31, 24, 0.15);
+    position: relative;
+    text-align: center;
+  }
+  .member-card:active { transform: scale(0.98); }
+  .member-card.complete {
+    background: linear-gradient(135deg, #E5EBD8 0%, #D4DCC0 100%);
+    border-color: var(--moss-soft);
+  }
+  .member-emoji {
+    font-size: 2.5rem; line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .member-name {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 1.1rem; color: var(--ink);
+    margin-bottom: 0.5rem;
+    font-variation-settings: "opsz" 60;
+  }
+  .progress-dots {
+    display: flex; justify-content: center; gap: 4px;
+    margin-top: 0.4rem;
+  }
+  .pdot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(43, 31, 24, 0.15);
+    transition: all 0.3s;
+  }
+  .pdot.filled { background: var(--wine); }
+  .pdot.complete-all { background: var(--moss); }
+  .progress-label {
+    font-family: var(--sans); font-size: 0.72rem;
+    color: var(--ink-soft); margin-top: 6px;
+    opacity: 0.75;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center; padding: 2rem 1rem;
+    border: 1px dashed rgba(43, 31, 24, 0.2);
+    border-radius: 14px;
+  }
+
+  /* Routine screen */
+  .routine-header {
+    text-align: center; margin-bottom: 1.5rem;
+  }
+  .routine-emoji { font-size: 3.5rem; line-height: 1; margin-bottom: 0.5rem; }
+  .routine-name {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 1.75rem; color: var(--ink);
+    font-variation-settings: "opsz" 100;
+  }
+  .routine-part {
+    font-family: var(--serif); font-style: italic;
+    color: var(--wine); font-size: 1rem;
+    margin-top: 4px;
+  }
+
+  /* Check items */
+  .check-list { display: flex; flex-direction: column; gap: 8px; margin: 1rem 0 2rem; }
+  .check-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 1rem 1.1rem;
+    background: var(--parchment);
+    border: 1px solid rgba(43, 31, 24, 0.08);
+    border-radius: 14px;
+    cursor: pointer; transition: all 0.25s;
+    min-height: 64px;
+  }
+  .check-item:active { transform: scale(0.99); }
+  .check-item.done {
+    background: rgba(94, 107, 67, 0.12);
+    border-color: rgba(94, 107, 67, 0.3);
+  }
+  .check-box {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid var(--ink-soft);
+    flex-shrink: 0; transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-item.done .check-box {
+    background: var(--moss); border-color: var(--moss);
+  }
+  .check-item.done .check-box::after {
+    content: ""; width: 12px; height: 7px;
+    border-left: 2.5px solid var(--cream);
+    border-bottom: 2.5px solid var(--cream);
+    transform: rotate(-45deg) translateY(-1px);
+  }
+  .check-label {
+    flex: 1; font-family: var(--serif); font-size: 1.15rem;
+    color: var(--ink); line-height: 1.3;
+    font-variation-settings: "opsz" 60;
+  }
+  .check-item.done .check-label {
+    color: var(--ink-soft); text-decoration: line-through;
+    text-decoration-color: rgba(43, 31, 24, 0.35);
+  }
+
+  /* Completion celebration */
+  .completion-banner {
+    background: linear-gradient(135deg, var(--moss-soft) 0%, var(--moss) 100%);
+    color: var(--cream); padding: 1.25rem;
+    border-radius: 14px; text-align: center;
+    margin-bottom: 1rem;
+    font-family: var(--serif); font-style: italic;
+    font-size: 1.05rem;
+    font-variation-settings: "opsz" 60;
+    animation: bannerIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes bannerIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Forms */
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label {
+    display: block; font-family: var(--sans); font-size: 0.8rem;
+    color: var(--ink-soft); margin-bottom: 6px; font-weight: 500;
+  }
+  .form-input, .form-select {
+    width: 100%; padding: 0.85rem 1rem;
+    border: 1px solid rgba(43, 31, 24, 0.18);
+    border-radius: 10px; background: rgba(255, 255, 255, 0.5);
+    font-family: var(--serif); font-size: 1.05rem; color: var(--ink);
+    outline: none; transition: border-color 0.2s;
+    font-variation-settings: "opsz" 30;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--wine); }
+  .form-select { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%235A4636' stroke-width='2' fill='none' stroke-linecap='round'/></svg>"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+
+  /* Emoji picker */
+  .emoji-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    gap: 8px; margin-top: 8px;
+  }
+  .emoji-btn {
+    aspect-ratio: 1; background: var(--parchment);
+    border: 1.5px solid transparent; border-radius: 12px;
+    font-size: 1.8rem; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .emoji-btn.selected {
+    border-color: var(--wine); background: var(--cream);
+    transform: scale(1.05);
+  }
+  .emoji-btn:active { transform: scale(0.95); }
+
+  /* Settings */
+  .settings-member-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 1rem; background: var(--parchment);
+    border-radius: 12px; cursor: pointer;
+    margin-bottom: 8px; transition: background 0.2s;
+  }
+  .settings-member-row:active { background: var(--parchment-deep); }
+  .settings-member-row .emoji { font-size: 1.8rem; }
+  .settings-member-row .name {
+    flex: 1; font-family: var(--serif); font-size: 1.1rem; color: var(--ink);
+    font-variation-settings: "opsz" 60;
+  }
+  .settings-member-row .arrow { color: var(--ink-soft); opacity: 0.5; }
+
+  /* Edit routine list */
+  .editable-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0.75rem; background: var(--parchment);
+    border-radius: 10px; margin-bottom: 6px;
+  }
+  .editable-item input {
+    flex: 1; background: transparent; border: none;
+    font-family: var(--serif); font-size: 1.05rem; color: var(--ink);
+    outline: none; padding: 4px 0;
+    font-variation-settings: "opsz" 60;
+  }
+  .delete-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--wine); opacity: 0.5; padding: 6px;
+    transition: opacity 0.2s;
+  }
+  .delete-btn:active { opacity: 1; }
+
+  /* Welcome screen */
+  .welcome-wrap {
+    min-height: 80vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 2rem 0;
+  }
+  .welcome-title {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 3rem; color: var(--wine); margin: 0;
+    font-variation-settings: "opsz" 144; letter-spacing: -0.02em;
+  }
+  .welcome-sub {
+    font-family: var(--serif); font-style: italic;
+    color: var(--ink-soft); font-size: 1.15rem;
+    margin-top: 1rem; max-width: 28ch; line-height: 1.45;
+  }
+
+  /* Back button */
+  .back-row {
+    margin-bottom: 1rem;
+  }
+  .back-btn {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--sans); font-size: 0.85rem;
+    color: var(--ink-soft); padding: 6px 0; display: inline-flex;
+    align-items: center; gap: 6px;
+  }
+  .back-btn:active { color: var(--wine); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink); color: var(--cream);
+    padding: 0.75rem 1.25rem; border-radius: 999px;
+    font-family: var(--sans); font-size: 0.9rem;
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,0.3);
+    z-index: 100; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  /* Footer ad maiorem */
+  .ad-mag {
+    text-align: center; margin-top: 2.5rem; padding-top: 1.5rem;
+    border-top: 1px solid rgba(43, 31, 24, 0.08);
+    font-family: var(--serif); font-style: italic;
+    color: var(--ink-soft); opacity: 0.55;
+    font-size: 0.75rem; letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+"use strict";
+
+// ────────── Constants ──────────
+const STORAGE_KEY = 'hearth.state.v1';
+const EMOJIS = ['👶','🧒','👧','👦','🧑','👩','👨','👵','👴','🦸','🤸','👼'];
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+}
+
+function uid() { return Math.random().toString(36).slice(2, 10); }
+
+// ────────── Default routines by age ──────────
+function defaultRoutines(age) {
+  const a = parseInt(age, 10) || 30;
+  if (a < 4) return {
+    morning: ['Potty', 'Get dressed', 'Brush teeth', 'Comb hair'],
+    evening: ['Bath', 'Pajamas', 'Brush teeth', 'Books', 'Prayers']
+  };
+  if (a < 8) return {
+    morning: ['Potty', 'Get dressed', 'Brush teeth', 'Brush hair', 'Eat breakfast', 'Vitamin'],
+    evening: ['Bath', 'Pajamas', 'Brush teeth', 'Books', 'Prayers']
+  };
+  if (a < 13) return {
+    morning: ['Get dressed', 'Make bed', 'Brush teeth', 'Brush hair', 'Wash face', 'Vitamin'],
+    evening: ['Bath or shower', 'Pajamas', 'Brush teeth', 'Lay out tomorrow\u2019s clothes', 'Prayers']
+  };
+  if (a < 18) return {
+    morning: ['Shower', 'Get dressed', 'Brush teeth', 'Hair', 'Skincare'],
+    evening: ['Shower', 'Brush teeth', 'Skincare', 'Pajamas', 'Lay out tomorrow\u2019s clothes']
+  };
+  return {
+    morning: ['Water', 'Wash face', 'Brush teeth', 'Get dressed', 'Hair', 'Vitamins'],
+    evening: ['Wash face', 'Brush teeth', 'Skincare', 'Pajamas', 'Tomorrow\u2019s clothes', 'Prayer']
+  };
+}
+
+function routineToItems(labels) {
+  return labels.map(l => ({ id: uid(), label: l }));
+}
+
+// ────────── State ──────────
+const defaultState = () => ({
+  setup: false,
+  members: [],
+  todayDate: todayStr(),
+  progress: {},
+  view: 'welcome',
+  draftMember: null,
+  activeMemberId: null,
+  activePart: null,
+  editingMemberId: null,
+});
+
+let state = defaultState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      state = { ...defaultState(), ...saved };
+      // Reset progress if it's a new day
+      if (state.todayDate !== todayStr()) {
+        state.todayDate = todayStr();
+        state.progress = {};
+      }
+      // Force view back to home on reload if setup is done
+      if (state.setup && ['add-member','routine','settings','edit-routine','edit-member','welcome'].includes(state.view)) {
+        state.view = 'home';
+      }
+    }
+  } catch (e) { console.error('load failed', e); }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) { console.error('save failed', e); }
+}
+
+function setState(patch) {
+  state = { ...state, ...patch };
+  saveState();
+  render();
+}
+
+// ────────── DOM helper ──────────
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  if (attrs) {
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'style') el.style.cssText = v;
+      else if (k.startsWith('on') && typeof v === 'function') {
+        el.addEventListener(k.slice(2).toLowerCase(), v);
+      } else if (k === 'html') {
+        el.innerHTML = v;
+      } else {
+        el.setAttribute(k, v);
+      }
+    }
+  }
+  for (const c of children.flat()) {
+    if (c == null || c === false) continue;
+    el.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(String(c)) : c);
+  }
+  return el;
+}
+
+// ────────── Toast ──────────
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ────────── Part selection (AM/PM) ──────────
+function autoPart() {
+  const hour = new Date().getHours();
+  return hour < 14 ? 'morning' : 'evening';
+}
+
+// ────────── Progress helpers ──────────
+function progressKey(memberId, part) { return `${memberId}:${part}`; }
+
+function isDone(memberId, part, itemId) {
+  return !!(state.progress[progressKey(memberId, part)]?.[itemId]);
+}
+
+function toggleItem(memberId, part, itemId) {
+  const key = progressKey(memberId, part);
+  const cur = { ...(state.progress[key] || {}) };
+  if (cur[itemId]) delete cur[itemId]; else cur[itemId] = true;
+  setState({ progress: { ...state.progress, [key]: cur } });
+}
+
+function memberProgress(memberId, part) {
+  const m = state.members.find(x => x.id === memberId);
+  if (!m) return { done: 0, total: 0 };
+  const items = m[part] || [];
+  const p = state.progress[progressKey(memberId, part)] || {};
+  let done = 0;
+  for (const it of items) if (p[it.id]) done++;
+  return { done, total: items.length };
+}
+
+// ────────── Render dispatch ──────────
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  let screen;
+  switch (state.view) {
+    case 'welcome': screen = renderWelcome(); break;
+    case 'add-member': screen = renderAddMember(); break;
+    case 'home': screen = renderHome(); break;
+    case 'routine': screen = renderRoutine(); break;
+    case 'settings': screen = renderSettings(); break;
+    case 'edit-member': screen = renderEditMember(); break;
+    case 'edit-routine': screen = renderEditRoutine(); break;
+    default: screen = renderHome();
+  }
+  app.appendChild(screen);
+  app.appendChild(h('div', { class: 'ad-mag' }, 'Ad maiorem Dei gloriam'));
+}
+
+// ────────── Welcome screen ──────────
+function renderWelcome() {
+  return h('div', { class: 'welcome-wrap' },
+    h('div', { class: 'fleuron' }, h('span', { style: 'font-family: var(--serif); font-size: 1.2rem;' }, '✦')),
+    h('h1', { class: 'welcome-title' }, 'Hearth'),
+    h('p', { class: 'welcome-sub' }, '"The steadfast love of the Lord never ceases; his mercies are new every morning."'),
+    h('p', { style: 'font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--ink-soft); opacity: 0.6; margin-top: 6px; text-transform: uppercase;' }, 'Lamentations 3:22-23 · RSV2CE'),
+    h('div', { class: 'fleuron' }, h('span', { style: 'font-family: var(--serif); font-size: 1.2rem;' }, '✦')),
+    h('p', { style: 'font-family: var(--serif); color: var(--ink); font-size: 1.05rem; line-height: 1.55; max-width: 30ch; margin: 1rem 0 2rem;' },
+      'Where your family\u2019s daily rhythms live. One tap per kid, per item. No nags. No notifications. Just rhythms you can see.'
+    ),
+    h('button', {
+      class: 'btn btn-primary btn-full',
+      style: 'max-width: 320px;',
+      onclick: () => setState({ view: 'add-member', draftMember: { id: uid(), name: '', emoji: '👩', age: '', isNew: true } })
+    }, 'Add your first family member')
+  );
+}
+
+// ────────── Add/Edit member ──────────
+function renderAddMember() {
+  const draft = state.draftMember || { id: uid(), name: '', emoji: '👩', age: '', isNew: true };
+  const isFirst = state.members.length === 0;
+
+  return h('div', null,
+    !isFirst && h('div', { class: 'back-row' },
+      h('button', { class: 'back-btn', onclick: () => setState({ view: state.setup ? 'settings' : 'home', draftMember: null }) }, '← Back')
+    ),
+    h('h2', { class: 'display', style: 'margin-bottom: 0.5rem;' }, draft.isNew ? 'Add a person' : 'Edit person'),
+    h('p', { class: 'italic-serif', style: 'font-size: 0.95rem; margin-bottom: 1.5rem;' }, 'Who lives in your house?'),
+
+    // Name
+    h('div', { class: 'form-group' },
+      h('label', { class: 'form-label' }, 'Name'),
+      h('input', {
+        class: 'form-input',
+        type: 'text',
+        value: draft.name,
+        placeholder: 'First name',
+        oninput: (e) => { state.draftMember = { ...draft, name: e.target.value }; }
+      })
+    ),
+
+    // Age
+    h('div', { class: 'form-group' },
+      h('label', { class: 'form-label' }, 'Age (used to suggest a starting routine)'),
+      h('input', {
+        class: 'form-input',
+        type: 'number',
+        min: '0',
+        max: '99',
+        value: draft.age,
+        placeholder: 'e.g. 8',
+        oninput: (e) => { state.draftMember = { ...draft, age: e.target.value }; }
+      })
+    ),
+
+    // Emoji
+    h('div', { class: 'form-group' },
+      h('label', { class: 'form-label' }, 'Pick a face'),
+      h('div', { class: 'emoji-grid' },
+        EMOJIS.map(e =>
+          h('button', {
+            class: 'emoji-btn' + (draft.emoji === e ? ' selected' : ''),
+            onclick: () => { state.draftMember = { ...state.draftMember, emoji: e }; render(); }
+          }, e)
+        )
+      )
+    ),
+
+    h('button', {
+      class: 'btn btn-primary btn-full',
+      style: 'margin-top: 1.5rem;',
+      onclick: () => saveDraftMember()
+    }, draft.isNew ? 'Add to family' : 'Save changes')
+  );
+}
+
+function saveDraftMember() {
+  const draft = state.draftMember;
+  if (!draft || !draft.name.trim()) {
+    toast('Name is required');
+    return;
+  }
+  const name = draft.name.trim();
+  if (draft.isNew) {
+    const r = defaultRoutines(draft.age);
+    const newMember = {
+      id: draft.id,
+      name,
+      emoji: draft.emoji,
+      age: draft.age,
+      morning: routineToItems(r.morning),
+      evening: routineToItems(r.evening),
+    };
+    setState({
+      members: [...state.members, newMember],
+      draftMember: null,
+      setup: true,
+      view: 'home',
+    });
+    toast(`${name} added`);
+  } else {
+    // edit existing
+    const updated = state.members.map(m =>
+      m.id === draft.id ? { ...m, name, emoji: draft.emoji, age: draft.age } : m
+    );
+    setState({ members: updated, draftMember: null, view: 'settings' });
+    toast('Saved');
+  }
+}
+
+// ────────── Home (main daily view) ──────────
+function renderHome() {
+  const part = state.activePart || autoPart();
+  const now = new Date();
+
+  const header = h('div', { class: 'app-header' },
+    h('div', null,
+      h('div', { class: 'title' }, 'Hearth'),
+      h('div', { class: 'date' }, fmtDate(now))
+    ),
+    h('button', { class: 'btn-icon', 'aria-label': 'Settings', onclick: () => setState({ view: 'settings' }) },
+      h('svg', { width: '22', height: '22', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', html: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>' })
+    )
+  );
+
+  const toggle = h('div', { class: 'toggle-group' },
+    h('button', { class: 'toggle-btn' + (part === 'morning' ? ' active' : ''), onclick: () => setState({ activePart: 'morning' }) }, '☀️ Morning'),
+    h('button', { class: 'toggle-btn' + (part === 'evening' ? ' active' : ''), onclick: () => setState({ activePart: 'evening' }) }, '🌙 Evening')
+  );
+
+  let body;
+  if (state.members.length === 0) {
+    body = h('div', { class: 'empty-state' },
+      h('p', { class: 'italic-serif', style: 'margin: 0 0 1rem;' }, 'No one in the house yet.'),
+      h('button', { class: 'btn btn-primary', onclick: () => setState({ view: 'add-member', draftMember: { id: uid(), name: '', emoji: '👩', age: '', isNew: true } }) }, 'Add a person')
+    );
+  } else {
+    body = h('div', { class: 'family-grid' },
+      state.members.map(m => {
+        const { done, total } = memberProgress(m.id, part);
+        const allDone = total > 0 && done === total;
+        return h('div', {
+          class: 'member-card' + (allDone ? ' complete' : ''),
+          onclick: () => setState({ view: 'routine', activeMemberId: m.id, activePart: part })
+        },
+          h('div', { class: 'member-emoji' }, m.emoji),
+          h('div', { class: 'member-name' }, m.name),
+          h('div', { class: 'progress-dots' },
+            Array.from({ length: total }).map((_, i) =>
+              h('div', { class: 'pdot' + (i < done ? (allDone ? ' complete-all' : ' filled') : '') })
+            )
+          ),
+          h('div', { class: 'progress-label' }, allDone ? '✓ Done' : `${done} of ${total}`)
+        );
+      })
+    );
+  }
+
+  return h('div', null, header, toggle, body);
+}
+
+// ────────── Routine (one person's checklist) ──────────
+function renderRoutine() {
+  const m = state.members.find(x => x.id === state.activeMemberId);
+  if (!m) {
+    setState({ view: 'home' });
+    return h('div');
+  }
+  const part = state.activePart || 'morning';
+  const items = m[part] || [];
+  const { done, total } = memberProgress(m.id, part);
+  const allDone = total > 0 && done === total;
+
+  return h('div', null,
+    h('div', { class: 'back-row' },
+      h('button', { class: 'back-btn', onclick: () => setState({ view: 'home', activeMemberId: null }) }, '← Back to family')
+    ),
+
+    h('div', { class: 'routine-header' },
+      h('div', { class: 'routine-emoji' }, m.emoji),
+      h('div', { class: 'routine-name' }, m.name),
+      h('div', { class: 'routine-part' }, part === 'morning' ? '☀️ Morning rhythm' : '🌙 Evening rhythm')
+    ),
+
+    allDone && h('div', { class: 'completion-banner' }, `✦ ${m.name} is done. Well done.`),
+
+    h('div', { class: 'check-list' },
+      items.length === 0
+        ? h('div', { class: 'empty-state' }, h('p', { class: 'italic-serif', style: 'margin: 0;' }, 'No items in this routine yet.'))
+        : items.map(it =>
+            h('div', {
+              class: 'check-item' + (isDone(m.id, part, it.id) ? ' done' : ''),
+              onclick: () => toggleItem(m.id, part, it.id)
+            },
+              h('div', { class: 'check-box' }),
+              h('div', { class: 'check-label' }, it.label)
+            )
+          )
+    ),
+
+    h('button', {
+      class: 'btn btn-ghost btn-full',
+      onclick: () => setState({ view: 'edit-routine', editingMemberId: m.id })
+    }, '✎ Edit this routine')
+  );
+}
+
+// ────────── Settings ──────────
+function renderSettings() {
+  return h('div', null,
+    h('div', { class: 'back-row' },
+      h('button', { class: 'back-btn', onclick: () => setState({ view: 'home' }) }, '← Back')
+    ),
+    h('h2', { class: 'display', style: 'margin-bottom: 0.5rem;' }, 'Settings'),
+    h('p', { class: 'italic-serif', style: 'font-size: 0.95rem; margin-bottom: 1.5rem;' }, 'Manage who lives here and what they do.'),
+
+    h('div', { class: 'h-section', style: 'margin-bottom: 10px;' }, 'Your family'),
+    h('div', { style: 'margin-bottom: 1.5rem;' },
+      state.members.map(m =>
+        h('div', {
+          class: 'settings-member-row',
+          onclick: () => setState({ view: 'edit-member', draftMember: { ...m, isNew: false } })
+        },
+          h('div', { class: 'emoji' }, m.emoji),
+          h('div', { class: 'name' }, m.name),
+          h('div', { class: 'arrow' }, '→')
+        )
+      )
+    ),
+
+    h('button', {
+      class: 'btn btn-primary btn-full',
+      style: 'margin-bottom: 0.5rem;',
+      onclick: () => setState({ view: 'add-member', draftMember: { id: uid(), name: '', emoji: '👶', age: '', isNew: true } })
+    }, '+ Add another person'),
+
+    h('div', { class: 'h-section', style: 'margin: 2rem 0 10px;' }, 'Danger zone'),
+    h('button', {
+      class: 'btn btn-ghost btn-full',
+      style: 'margin-bottom: 8px;',
+      onclick: () => {
+        if (confirm('Clear today\u2019s checkmarks for everyone? (Routines stay.)')) {
+          setState({ progress: {} });
+          toast('Today reset');
+        }
+      }
+    }, 'Reset today\u2019s progress'),
+    h('button', {
+      class: 'btn btn-ghost btn-full',
+      style: 'color: var(--wine);',
+      onclick: () => {
+        if (confirm('Erase all of Hearth and start over? This deletes everyone and all routines.')) {
+          localStorage.removeItem(STORAGE_KEY);
+          state = defaultState();
+          render();
+          toast('Erased');
+        }
+      }
+    }, 'Erase everything')
+  );
+}
+
+// ────────── Edit member (from settings) ──────────
+function renderEditMember() {
+  const draft = state.draftMember;
+  if (!draft) { setState({ view: 'settings' }); return h('div'); }
+  const fullMember = state.members.find(m => m.id === draft.id);
+
+  return h('div', null,
+    h('div', { class: 'back-row' },
+      h('button', { class: 'back-btn', onclick: () => setState({ view: 'settings', draftMember: null }) }, '← Back to settings')
+    ),
+    h('div', { style: 'text-align: center; margin-bottom: 1.5rem;' },
+      h('div', { style: 'font-size: 3rem;' }, draft.emoji),
+      h('h2', { class: 'display', style: 'margin-top: 0.5rem;' }, draft.name)
+    ),
+
+    h('div', { class: 'form-group' },
+      h('label', { class: 'form-label' }, 'Name'),
+      h('input', {
+        class: 'form-input', type: 'text', value: draft.name,
+        oninput: (e) => { state.draftMember = { ...draft, name: e.target.value }; }
+      })
+    ),
+    h('div', { class: 'form-group' },
+      h('label', { class: 'form-label' }, 'Pick a face'),
+      h('div', { class: 'emoji-grid' },
+        EMOJIS.map(e =>
+          h('button', {
+            class: 'emoji-btn' + (state.draftMember.emoji === e ? ' selected' : ''),
+            onclick: () => { state.draftMember = { ...state.draftMember, emoji: e }; render(); }
+          }, e)
+        )
+      )
+    ),
+    h('button', {
+      class: 'btn btn-primary btn-full',
+      style: 'margin-top: 1rem;',
+      onclick: () => saveDraftMember()
+    }, 'Save name and face'),
+
+    h('div', { class: 'h-section', style: 'margin: 2rem 0 10px;' }, 'Routines'),
+    h('button', {
+      class: 'btn btn-ghost btn-full',
+      style: 'margin-bottom: 8px;',
+      onclick: () => setState({ view: 'edit-routine', editingMemberId: draft.id, activePart: 'morning' })
+    }, '☀️ Edit morning routine'),
+    h('button', {
+      class: 'btn btn-ghost btn-full',
+      onclick: () => setState({ view: 'edit-routine', editingMemberId: draft.id, activePart: 'evening' })
+    }, '🌙 Edit evening routine'),
+
+    h('div', { class: 'h-section', style: 'margin: 2rem 0 10px; color: var(--wine);' }, 'Remove'),
+    h('button', {
+      class: 'btn btn-ghost btn-full',
+      style: 'color: var(--wine); border-color: var(--wine);',
+      onclick: () => {
+        if (confirm(`Remove ${draft.name} from Hearth?`)) {
+          setState({
+            members: state.members.filter(m => m.id !== draft.id),
+            draftMember: null,
+            view: 'settings'
+          });
+          toast(`${draft.name} removed`);
+        }
+      }
+    }, `Remove ${draft.name}`)
+  );
+}
+
+// ────────── Edit routine ──────────
+function renderEditRoutine() {
+  const m = state.members.find(x => x.id === state.editingMemberId);
+  if (!m) { setState({ view: 'home' }); return h('div'); }
+  const part = state.activePart || 'morning';
+  const items = m[part] || [];
+
+  return h('div', null,
+    h('div', { class: 'back-row' },
+      h('button', { class: 'back-btn', onclick: () => setState({ view: 'routine', activeMemberId: m.id, editingMemberId: null }) }, '← Done editing')
+    ),
+    h('div', { style: 'text-align: center; margin-bottom: 1rem;' },
+      h('div', { style: 'font-size: 2.5rem;' }, m.emoji),
+      h('div', { class: 'routine-name', style: 'font-size: 1.4rem; margin-top: 4px;' }, m.name),
+      h('div', { class: 'routine-part' }, part === 'morning' ? '☀️ Morning' : '🌙 Evening')
+    ),
+    h('p', { class: 'italic-serif', style: 'font-size: 0.9rem; text-align: center; margin-bottom: 1.25rem;' },
+      'Tap to rename. Use the × to remove.'
+    ),
+
+    h('div', null,
+      items.map((it, idx) =>
+        h('div', { class: 'editable-item' },
+          h('input', {
+            type: 'text', value: it.label,
+            oninput: (e) => {
+              const newItems = [...items];
+              newItems[idx] = { ...it, label: e.target.value };
+              updateMemberRoutine(m.id, part, newItems);
+            }
+          }),
+          h('button', {
+            class: 'delete-btn', 'aria-label': 'Delete',
+            onclick: () => {
+              const newItems = items.filter(x => x.id !== it.id);
+              updateMemberRoutine(m.id, part, newItems);
+            }
+          }, '✕')
+        )
+      )
+    ),
+
+    h('button', {
+      class: 'btn btn-ghost btn-full',
+      style: 'margin-top: 12px;',
+      onclick: () => {
+        const newItems = [...items, { id: uid(), label: 'New item' }];
+        updateMemberRoutine(m.id, part, newItems);
+      }
+    }, '+ Add an item')
+  );
+}
+
+function updateMemberRoutine(memberId, part, newItems) {
+  const updated = state.members.map(m =>
+    m.id === memberId ? { ...m, [part]: newItems } : m
+  );
+  setState({ members: updated });
+}
+
+// ────────── Boot ──────────
+loadState();
+if (!state.setup && state.members.length === 0) state.view = 'welcome';
+else if (state.view === 'welcome') state.view = 'home';
+render();
+
+// Service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW failed', err));
+  });
+}
+
+// Reset progress at midnight if app stays open
+setInterval(() => {
+  if (state.todayDate !== todayStr()) {
+    state.todayDate = todayStr();
+    state.progress = {};
+    saveState();
+    render();
+  }
+}, 60000);
+</script>
+</body>
+</html>
