@@ -135,6 +135,34 @@
     border-radius: 12px; padding: 4px;
     margin-bottom: 1.5rem;
   }
+
+  /* Daily scripture verse block */
+  .verse-block {
+    text-align: center;
+    margin: 0.25rem 0 1.5rem;
+    padding: 1rem 0.75rem 0.85rem;
+    border-top: 1px solid rgba(168, 137, 63, 0.22);
+    border-bottom: 1px solid rgba(168, 137, 63, 0.22);
+  }
+  .verse-text {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    font-variation-settings: "opsz" 30;
+    max-width: 38ch;
+    margin: 0 auto;
+  }
+  .verse-ref {
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    opacity: 0.75;
+    margin-top: 10px;
+  }
   .toggle-btn {
     flex: 1; padding: 0.75rem; background: transparent; border: none;
     font-family: var(--sans); font-size: 0.95rem; font-weight: 500;
@@ -169,6 +197,21 @@
   .member-card.complete {
     background: linear-gradient(135deg, #E2EAD7 0%, #CFDBBE 100%);
     border-color: var(--moss-soft);
+  }
+  .member-card.add-card {
+    background: transparent;
+    border: 1.5px dashed rgba(168, 137, 63, 0.40);
+    box-shadow: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 130px;
+  }
+  .member-card.add-card .add-plus {
+    font-family: var(--serif); font-size: 2.5rem; color: var(--gold-deep);
+    line-height: 1; font-weight: 300;
+  }
+  .member-card.add-card .add-label {
+    font-family: var(--serif); font-style: italic; font-size: 0.85rem;
+    color: var(--ink-soft); margin-top: 6px;
   }
   .member-emoji {
     font-size: 2.5rem; line-height: 1;
@@ -236,6 +279,17 @@
     background: rgba(168, 184, 154, 0.18);
     border-color: rgba(143, 160, 129, 0.35);
   }
+  .check-item.freq-due {
+    background: rgba(229, 198, 189, 0.30);
+    border-color: rgba(209, 168, 158, 0.55);
+  }
+  .check-label-wrap { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .check-sublabel {
+    font-family: var(--sans); font-size: 0.72rem;
+    color: var(--ink-soft); letter-spacing: 0.02em; opacity: 0.85;
+  }
+  .check-item.freq-due .check-sublabel { color: var(--gold-deep); opacity: 1; font-weight: 600; }
+  .check-item.done .check-sublabel { color: var(--sage-deep); }
   .check-box {
     width: 32px; height: 32px; border-radius: 50%;
     border: 2px solid var(--ink-soft);
@@ -328,16 +382,31 @@
 
   /* Edit routine list */
   .editable-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 0.75rem; background: var(--parchment);
+    display: flex; align-items: center; gap: 8px;
+    padding: 0.65rem 0.75rem; background: var(--parchment);
     border-radius: 10px; margin-bottom: 6px;
   }
   .editable-item input {
-    flex: 1; background: transparent; border: none;
+    flex: 1; min-width: 0;
+    background: transparent; border: none;
     font-family: var(--serif); font-size: 1.05rem; color: var(--ink);
     outline: none; padding: 4px 0;
     font-variation-settings: "opsz" 60;
   }
+  .freq-select {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(43, 31, 24, 0.12);
+    border-radius: 8px; padding: 6px 24px 6px 8px;
+    font-family: var(--sans); font-size: 0.78rem; color: var(--ink-soft);
+    outline: none; cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' stroke='%236B5D52' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    max-width: 130px;
+  }
+  .freq-select:focus { border-color: var(--gold-deep); }
   .delete-btn {
     background: none; border: none; cursor: pointer;
     color: var(--wine); opacity: 0.5; padding: 6px;
@@ -408,6 +477,24 @@
 const STORAGE_KEY = 'hearth.state.v1';
 const EMOJIS = ['👶','🧒','👧','👦','🧑','👩','👨','👵','👴','🦸','🤸','👼'];
 
+// Daily scripture rotation by day of week — RSV2CE
+const VERSES = [
+  // Sunday
+  { ref: 'Matthew 11:28', text: 'Come to me, all who labor and are heavy laden, and I will give you rest.' },
+  // Monday
+  { ref: 'Lamentations 3:22\u201323', text: 'The steadfast love of the LORD never ceases, his mercies never come to an end; they are new every morning; great is thy faithfulness.' },
+  // Tuesday
+  { ref: 'Psalm 46:10', text: 'Be still, and know that I am God.' },
+  // Wednesday
+  { ref: 'Philippians 4:6', text: 'Have no anxiety about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God.' },
+  // Thursday
+  { ref: '2 Corinthians 12:9', text: 'My grace is sufficient for you, for my power is made perfect in weakness.' },
+  // Friday
+  { ref: 'Matthew 6:34', text: 'Do not be anxious about tomorrow, for tomorrow will be anxious for itself. Let the day\u2019s own trouble be sufficient for the day.' },
+  // Saturday
+  { ref: 'Psalm 127:2', text: 'It is in vain that you rise up early and go late to rest, eating the bread of anxious toil; for he gives to his beloved sleep.' },
+];
+
 function todayStr() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -420,32 +507,38 @@ function fmtDate(d) {
 function uid() { return Math.random().toString(36).slice(2, 10); }
 
 // ────────── Default routines by age ──────────
+// An item is either a string (daily) or { label, freq } (freq = days between)
 function defaultRoutines(age) {
   const a = parseInt(age, 10) || 30;
   if (a < 4) return {
     morning: ['Potty', 'Get dressed', 'Brush teeth', 'Comb hair'],
-    evening: ['Bath', 'Pajamas', 'Brush teeth', 'Books', 'Prayers']
+    evening: [{ label: 'Bath', freq: 3 }, 'Pajamas', 'Brush teeth', 'Books', 'Prayers']
   };
   if (a < 8) return {
     morning: ['Potty', 'Get dressed', 'Brush teeth', 'Brush hair', 'Eat breakfast', 'Vitamin'],
-    evening: ['Bath', 'Pajamas', 'Brush teeth', 'Books', 'Prayers']
+    evening: [{ label: 'Bath', freq: 3 }, 'Pajamas', 'Brush teeth', 'Books', 'Prayers']
   };
   if (a < 13) return {
     morning: ['Get dressed', 'Make bed', 'Brush teeth', 'Brush hair', 'Wash face', 'Vitamin'],
-    evening: ['Bath or shower', 'Pajamas', 'Brush teeth', 'Lay out tomorrow\u2019s clothes', 'Prayers']
+    evening: [{ label: 'Bath or shower', freq: 3 }, 'Pajamas', 'Brush teeth', 'Lay out tomorrow\u2019s clothes', 'Prayers']
   };
   if (a < 18) return {
-    morning: ['Shower', 'Get dressed', 'Brush teeth', 'Hair', 'Skincare'],
-    evening: ['Shower', 'Brush teeth', 'Skincare', 'Pajamas', 'Lay out tomorrow\u2019s clothes']
+    morning: [{ label: 'Shower', freq: 2 }, 'Get dressed', 'Brush teeth', 'Hair', 'Skincare'],
+    evening: ['Brush teeth', 'Skincare', 'Pajamas', 'Lay out tomorrow\u2019s clothes']
   };
   return {
     morning: ['Water', 'Wash face', 'Brush teeth', 'Get dressed', 'Hair', 'Vitamins'],
-    evening: ['Wash face', 'Brush teeth', 'Skincare', 'Pajamas', 'Tomorrow\u2019s clothes', 'Prayer']
+    evening: ['Wash face', 'Brush teeth', 'Skincare', { label: 'Bath or shower', freq: 2 }, 'Pajamas', 'Tomorrow\u2019s clothes', 'Prayer']
   };
 }
 
-function routineToItems(labels) {
-  return labels.map(l => ({ id: uid(), label: l }));
+function routineToItems(items) {
+  return items.map(it => {
+    if (typeof it === 'string') return { id: uid(), label: it };
+    const out = { id: uid(), label: it.label };
+    if (it.freq && it.freq > 1) out.freq = it.freq;
+    return out;
+  });
 }
 
 // ────────── State ──────────
@@ -454,12 +547,28 @@ const defaultState = () => ({
   members: [],
   todayDate: todayStr(),
   progress: {},
+  lastDone: {}, // { 'memberId:itemId': 'YYYY-MM-DD' } — for non-daily items
   view: 'welcome',
   draftMember: null,
   activeMemberId: null,
   activePart: null,
   editingMemberId: null,
 });
+
+// Days between two ISO date strings (YYYY-MM-DD)
+function daysBetween(iso1, iso2) {
+  const d1 = new Date(iso1 + 'T00:00:00');
+  const d2 = new Date(iso2 + 'T00:00:00');
+  return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+}
+
+// Frequency options used in the routine editor
+const FREQ_OPTIONS = [
+  { value: '', label: 'Daily' },
+  { value: '2', label: 'Every 2 days' },
+  { value: '3', label: 'Every 3 days' },
+  { value: '7', label: 'Weekly' },
+];
 
 let state = defaultState();
 
@@ -536,26 +645,68 @@ function autoPart() {
 
 // ────────── Progress helpers ──────────
 function progressKey(memberId, part) { return `${memberId}:${part}`; }
+function lastDoneKey(memberId, itemId) { return `${memberId}:${itemId}`; }
+
+function getItem(memberId, part, itemId) {
+  const m = state.members.find(x => x.id === memberId);
+  if (!m) return null;
+  return (m[part] || []).find(it => it.id === itemId) || null;
+}
+
+// Is a non-daily item due to be done? (i.e. should it appear in today's list)
+function isDueToday(memberId, item) {
+  if (!item.freq || item.freq <= 1) return true; // daily items always due
+  const last = state.lastDone[lastDoneKey(memberId, item.id)];
+  if (!last) return true; // never done
+  const days = daysBetween(last, todayStr());
+  return days >= item.freq;
+}
+
+function daysSince(memberId, itemId) {
+  const last = state.lastDone[lastDoneKey(memberId, itemId)];
+  if (!last) return null;
+  return daysBetween(last, todayStr());
+}
 
 function isDone(memberId, part, itemId) {
+  const item = getItem(memberId, part, itemId);
+  if (item && item.freq && item.freq > 1) {
+    return state.lastDone[lastDoneKey(memberId, itemId)] === todayStr();
+  }
   return !!(state.progress[progressKey(memberId, part)]?.[itemId]);
 }
 
 function toggleItem(memberId, part, itemId) {
+  const item = getItem(memberId, part, itemId);
+  if (item && item.freq && item.freq > 1) {
+    const key = lastDoneKey(memberId, itemId);
+    const nextLastDone = { ...state.lastDone };
+    if (nextLastDone[key] === todayStr()) delete nextLastDone[key];
+    else nextLastDone[key] = todayStr();
+    setState({ lastDone: nextLastDone });
+    return;
+  }
   const key = progressKey(memberId, part);
   const cur = { ...(state.progress[key] || {}) };
   if (cur[itemId]) delete cur[itemId]; else cur[itemId] = true;
   setState({ progress: { ...state.progress, [key]: cur } });
 }
 
-function memberProgress(memberId, part) {
+// Items visible today: all daily items + any non-daily items that are due or done today
+function visibleItems(memberId, part) {
   const m = state.members.find(x => x.id === memberId);
-  if (!m) return { done: 0, total: 0 };
-  const items = m[part] || [];
-  const p = state.progress[progressKey(memberId, part)] || {};
+  if (!m) return [];
+  return (m[part] || []).filter(it => {
+    if (!it.freq || it.freq <= 1) return true;
+    return isDueToday(memberId, it) || isDone(memberId, part, it.id);
+  });
+}
+
+function memberProgress(memberId, part) {
+  const vis = visibleItems(memberId, part);
   let done = 0;
-  for (const it of items) if (p[it.id]) done++;
-  return { done, total: items.length };
+  for (const it of vis) if (isDone(memberId, part, it.id)) done++;
+  return { done, total: vis.length };
 }
 
 // ────────── Render dispatch ──────────
@@ -582,8 +733,8 @@ function renderWelcome() {
   return h('div', { class: 'welcome-wrap' },
     h('div', { class: 'fleuron' }, h('span', { style: 'font-family: var(--serif); font-size: 1.2rem;' }, '✦')),
     h('h1', { class: 'welcome-title' }, 'Heart \u0026 Hearth'),
-    h('p', { class: 'welcome-sub' }, '"The steadfast love of the Lord never ceases; his mercies are new every morning."'),
-    h('p', { style: 'font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--ink-soft); opacity: 0.6; margin-top: 6px; text-transform: uppercase;' }, 'Lamentations 3:22-23 · RSV2CE'),
+    h('p', { class: 'welcome-sub' }, '"As for me and my house, we will serve the LORD."'),
+    h('p', { style: 'font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--ink-soft); opacity: 0.6; margin-top: 6px; text-transform: uppercase;' }, 'Joshua 24:15 · RSV2CE'),
     h('div', { class: 'fleuron' }, h('span', { style: 'font-family: var(--serif); font-size: 1.2rem;' }, '✦')),
     h('p', { style: 'font-family: var(--serif); color: var(--ink); font-size: 1.05rem; line-height: 1.55; max-width: 30ch; margin: 1rem 0 2rem;' },
       'Where your family\u2019s daily rhythms live. One tap per kid, per item. No nags. No notifications. Just rhythms you can see.'
@@ -704,6 +855,12 @@ function renderHome() {
     )
   );
 
+  const verse = VERSES[now.getDay()];
+  const verseBlock = h('div', { class: 'verse-block' },
+    h('div', { class: 'verse-text' }, `\u201C${verse.text}\u201D`),
+    h('div', { class: 'verse-ref' }, `${verse.ref} \u00B7 RSV2CE`)
+  );
+
   const toggle = h('div', { class: 'toggle-group' },
     h('button', { class: 'toggle-btn' + (part === 'morning' ? ' active' : ''), onclick: () => setState({ activePart: 'morning' }) }, '☀️ Morning'),
     h('button', { class: 'toggle-btn' + (part === 'evening' ? ' active' : ''), onclick: () => setState({ activePart: 'evening' }) }, '🌙 Evening')
@@ -716,8 +873,7 @@ function renderHome() {
       h('button', { class: 'btn btn-primary', onclick: () => setState({ view: 'add-member', draftMember: { id: uid(), name: '', emoji: '👩', age: '', isNew: true } }) }, 'Add a person')
     );
   } else {
-    body = h('div', { class: 'family-grid' },
-      state.members.map(m => {
+    const memberCards = state.members.map(m => {
         const { done, total } = memberProgress(m.id, part);
         const allDone = total > 0 && done === total;
         return h('div', {
@@ -731,13 +887,23 @@ function renderHome() {
               h('div', { class: 'pdot' + (i < done ? (allDone ? ' complete-all' : ' filled') : '') })
             )
           ),
-          h('div', { class: 'progress-label' }, allDone ? '✓ Done' : `${done} of ${total}`)
+          h('div', { class: 'progress-label' }, total === 0 ? 'Nothing due today' : (allDone ? '✓ Done' : `${done} of ${total}`))
         );
-      })
+      });
+    // "+ Add another person" card always available at the end
+    memberCards.push(
+      h('div', {
+        class: 'member-card add-card',
+        onclick: () => setState({ view: 'add-member', draftMember: { id: uid(), name: '', emoji: '👶', age: '', isNew: true } })
+      },
+        h('div', { class: 'add-plus' }, '+'),
+        h('div', { class: 'add-label' }, 'Add someone')
+      )
     );
+    body = h('div', { class: 'family-grid' }, memberCards);
   }
 
-  return h('div', null, header, toggle, body);
+  return h('div', null, header, verseBlock, toggle, body);
 }
 
 // ────────── Routine (one person's checklist) ──────────
@@ -748,7 +914,7 @@ function renderRoutine() {
     return h('div');
   }
   const part = state.activePart || 'morning';
-  const items = m[part] || [];
+  const items = visibleItems(m.id, part);
   const { done, total } = memberProgress(m.id, part);
   const allDone = total > 0 && done === total;
 
@@ -767,16 +933,29 @@ function renderRoutine() {
 
     h('div', { class: 'check-list' },
       items.length === 0
-        ? h('div', { class: 'empty-state' }, h('p', { class: 'italic-serif', style: 'margin: 0;' }, 'No items in this routine yet.'))
-        : items.map(it =>
-            h('div', {
-              class: 'check-item' + (isDone(m.id, part, it.id) ? ' done' : ''),
+        ? h('div', { class: 'empty-state' }, h('p', { class: 'italic-serif', style: 'margin: 0;' }, total === 0 && (m[part] || []).length > 0 ? 'Nothing due right now.' : 'No items in this routine yet.'))
+        : items.map(it => {
+            const done = isDone(m.id, part, it.id);
+            const isFreq = it.freq && it.freq > 1;
+            const days = isFreq ? daysSince(m.id, it.id) : null;
+            let freqText = null;
+            if (isFreq) {
+              if (done) freqText = `Every ${it.freq} days · done today`;
+              else if (days === null) freqText = `Every ${it.freq} days · never done`;
+              else if (days > it.freq) freqText = `Every ${it.freq} days · ${days - it.freq}d overdue`;
+              else freqText = `Every ${it.freq} days · due`;
+            }
+            return h('div', {
+              class: 'check-item' + (done ? ' done' : '') + (isFreq && !done ? ' freq-due' : ''),
               onclick: () => toggleItem(m.id, part, it.id)
             },
               h('div', { class: 'check-box' }),
-              h('div', { class: 'check-label' }, it.label)
-            )
-          )
+              h('div', { class: 'check-label-wrap' },
+                h('div', { class: 'check-label' }, it.label),
+                freqText && h('div', { class: 'check-sublabel' }, freqText)
+              )
+            );
+          })
     ),
 
     h('button', {
@@ -926,7 +1105,7 @@ function renderEditRoutine() {
       h('div', { class: 'routine-part' }, part === 'morning' ? '☀️ Morning' : '🌙 Evening')
     ),
     h('p', { class: 'italic-serif', style: 'font-size: 0.9rem; text-align: center; margin-bottom: 1.25rem;' },
-      'Tap to rename. Use the × to remove.'
+      'Tap to rename. Set how often. Use × to remove.'
     ),
 
     h('div', null,
@@ -940,6 +1119,23 @@ function renderEditRoutine() {
               updateMemberRoutine(m.id, part, newItems);
             }
           }),
+          h('select', {
+            class: 'freq-select',
+            'aria-label': 'How often',
+            onchange: (e) => {
+              const v = e.target.value;
+              const newItems = [...items];
+              const next = { ...it };
+              if (v) next.freq = parseInt(v, 10);
+              else delete next.freq;
+              newItems[idx] = next;
+              updateMemberRoutine(m.id, part, newItems);
+            }
+          },
+            FREQ_OPTIONS.map(opt =>
+              h('option', { value: opt.value, selected: String(it.freq || '') === opt.value }, opt.label)
+            )
+          ),
           h('button', {
             class: 'delete-btn', 'aria-label': 'Delete',
             onclick: () => {
