@@ -1,12 +1,12 @@
 {
-  "name": "Hearth",
-  "short_name": "Hearth",
+  "name": "Heart & Hearth",
+  "short_name": "H & H",
   "description": "Where your family's daily rhythms live.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F5EEE0",
-  "theme_color": "#6E2A2A",
+  "background_color": "#F8F2E7",
+  "theme_color": "#C4A661",
   "orientation": "portrait",
   "icons": [
     {

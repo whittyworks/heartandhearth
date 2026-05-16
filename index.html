@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<title>Hearth</title>
-<meta name="theme-color" content="#6E2A2A">
+<title>Heart &amp; Hearth</title>
+<meta name="theme-color" content="#C4A661">
 <meta name="description" content="Where your family's daily rhythms live.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Hearth">
+<meta name="apple-mobile-web-app-title" content="H &amp; H">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="icon" type="image/png" href="./icon-192.png">
@@ -17,17 +17,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #F5EEE0;
-    --parchment: #EFE6D2;
-    --parchment-deep: #E5D9BD;
-    --ink: #2B1F18;
-    --ink-soft: #5A4636;
-    --wine: #6E2A2A;
-    --wine-deep: #4A1717;
-    --rose: #C97B6B;
-    --gold: #B08A3E;
-    --moss: #5E6B43;
-    --moss-soft: #8FA06D;
+    --cream: #F8F2E7;
+    --parchment: #EFE7D4;
+    --parchment-deep: #E5DAC3;
+    --ink: #3D332B;
+    --ink-soft: #6B5D52;
+    --gold: #C4A661;
+    --gold-deep: #A8893F;
+    --blush: #E5C6BD;
+    --blush-deep: #D1A89E;
+    --sage: #A8B89A;
+    --sage-deep: #8FA081;
+    /* Aliases mapped to MHC brand so existing classes still resolve */
+    --wine: var(--gold-deep);
+    --wine-deep: #8E7331;
+    --rose: var(--blush);
+    --moss: var(--sage-deep);
+    --moss-soft: var(--sage);
     --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
     --sans: 'Manrope', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   }
@@ -44,8 +50,8 @@
     min-height: 100vh;
     min-height: 100dvh;
     background:
-      radial-gradient(circle at 18% 8%, rgba(192, 138, 62, 0.08), transparent 45%),
-      radial-gradient(circle at 82% 92%, rgba(110, 42, 42, 0.07), transparent 45%),
+      radial-gradient(circle at 18% 8%, rgba(196, 166, 97, 0.10), transparent 45%),
+      radial-gradient(circle at 82% 92%, rgba(168, 184, 154, 0.10), transparent 45%),
       var(--cream);
     background-attachment: fixed;
     position: relative;
@@ -90,7 +96,7 @@
   }
   .btn-primary {
     background: var(--wine); color: var(--cream);
-    box-shadow: 0 4px 14px -4px rgba(110, 42, 42, 0.5);
+    box-shadow: 0 4px 14px -4px rgba(168, 137, 63, 0.45);
   }
   .btn-primary:active { background: var(--wine-deep); transform: scale(0.98); }
   .btn-ghost {
@@ -149,7 +155,7 @@
   }
   .member-card {
     background: var(--parchment);
-    border: 1px solid rgba(110, 42, 42, 0.12);
+    border: 1px solid rgba(168, 137, 63, 0.18);
     border-radius: 16px;
     padding: 1rem 0.85rem 0.9rem;
     cursor: pointer; transition: all 0.2s;
@@ -161,7 +167,7 @@
   }
   .member-card:active { transform: scale(0.98); }
   .member-card.complete {
-    background: linear-gradient(135deg, #E5EBD8 0%, #D4DCC0 100%);
+    background: linear-gradient(135deg, #E2EAD7 0%, #CFDBBE 100%);
     border-color: var(--moss-soft);
   }
   .member-emoji {
@@ -227,8 +233,8 @@
   }
   .check-item:active { transform: scale(0.99); }
   .check-item.done {
-    background: rgba(94, 107, 67, 0.12);
-    border-color: rgba(94, 107, 67, 0.3);
+    background: rgba(168, 184, 154, 0.18);
+    border-color: rgba(143, 160, 129, 0.35);
   }
   .check-box {
     width: 32px; height: 32px; border-radius: 50%;
@@ -575,7 +581,7 @@ function render() {
 function renderWelcome() {
   return h('div', { class: 'welcome-wrap' },
     h('div', { class: 'fleuron' }, h('span', { style: 'font-family: var(--serif); font-size: 1.2rem;' }, '✦')),
-    h('h1', { class: 'welcome-title' }, 'Hearth'),
+    h('h1', { class: 'welcome-title' }, 'Heart \u0026 Hearth'),
     h('p', { class: 'welcome-sub' }, '"The steadfast love of the Lord never ceases; his mercies are new every morning."'),
     h('p', { style: 'font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--ink-soft); opacity: 0.6; margin-top: 6px; text-transform: uppercase;' }, 'Lamentations 3:22-23 · RSV2CE'),
     h('div', { class: 'fleuron' }, h('span', { style: 'font-family: var(--serif); font-size: 1.2rem;' }, '✦')),
@@ -690,7 +696,7 @@ function renderHome() {
 
   const header = h('div', { class: 'app-header' },
     h('div', null,
-      h('div', { class: 'title' }, 'Hearth'),
+      h('div', { class: 'title' }, 'Heart \u0026 Hearth'),
       h('div', { class: 'date' }, fmtDate(now))
     ),
     h('button', { class: 'btn-icon', 'aria-label': 'Settings', onclick: () => setState({ view: 'settings' }) },
@@ -824,7 +830,7 @@ function renderSettings() {
       class: 'btn btn-ghost btn-full',
       style: 'color: var(--wine);',
       onclick: () => {
-        if (confirm('Erase all of Hearth and start over? This deletes everyone and all routines.')) {
+        if (confirm('Erase all of Heart \u0026 Hearth and start over? This deletes everyone and all routines.')) {
           localStorage.removeItem(STORAGE_KEY);
           state = defaultState();
           render();
@@ -890,7 +896,7 @@ function renderEditMember() {
       class: 'btn btn-ghost btn-full',
       style: 'color: var(--wine); border-color: var(--wine);',
       onclick: () => {
-        if (confirm(`Remove ${draft.name} from Hearth?`)) {
+        if (confirm(`Remove ${draft.name} from Heart \u0026 Hearth?`)) {
           setState({
             members: state.members.filter(m => m.id !== draft.id),
             draftMember: null,
