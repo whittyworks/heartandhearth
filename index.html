@@ -616,7 +616,7 @@ function renderAddMember() {
         type: 'text',
         value: draft.name,
         placeholder: 'First name',
-        oninput: (e) => { state.draftMember = { ...draft, name: e.target.value }; }
+        oninput: (e) => { state.draftMember = { ...state.draftMember, name: e.target.value }; }
       })
     ),
 
@@ -630,7 +630,7 @@ function renderAddMember() {
         max: '99',
         value: draft.age,
         placeholder: 'e.g. 8',
-        oninput: (e) => { state.draftMember = { ...draft, age: e.target.value }; }
+        oninput: (e) => { state.draftMember = { ...state.draftMember, age: e.target.value }; }
       })
     ),
 
@@ -860,7 +860,7 @@ function renderEditMember() {
       h('label', { class: 'form-label' }, 'Name'),
       h('input', {
         class: 'form-input', type: 'text', value: draft.name,
-        oninput: (e) => { state.draftMember = { ...draft, name: e.target.value }; }
+        oninput: (e) => { state.draftMember = { ...state.draftMember, name: e.target.value }; }
       })
     ),
     h('div', { class: 'form-group' },
