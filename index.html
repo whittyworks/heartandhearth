@@ -1114,9 +1114,14 @@ function renderEditRoutine() {
           h('input', {
             type: 'text', value: it.label,
             oninput: (e) => {
-              const newItems = [...items];
-              newItems[idx] = { ...it, label: e.target.value };
-              updateMemberRoutine(m.id, part, newItems);
+              // Read latest items from state to avoid clobbering other recent edits
+              const latest = currentItems(m.id, part);
+              const i = latest.findIndex(x => x.id === it.id);
+              if (i < 0) return;
+              const newItems = [...latest];
+              newItems[i] = { ...latest[i], label: e.target.value };
+              updateMemberRoutineSilent(m.id, part, newItems);
+              // No re-render → input keeps focus while typing
             }
           }),
           h('select', {
@@ -1124,11 +1129,14 @@ function renderEditRoutine() {
             'aria-label': 'How often',
             onchange: (e) => {
               const v = e.target.value;
-              const newItems = [...items];
-              const next = { ...it };
+              const latest = currentItems(m.id, part);
+              const i = latest.findIndex(x => x.id === it.id);
+              if (i < 0) return;
+              const next = { ...latest[i] };
               if (v) next.freq = parseInt(v, 10);
               else delete next.freq;
-              newItems[idx] = next;
+              const newItems = [...latest];
+              newItems[i] = next;
               updateMemberRoutine(m.id, part, newItems);
             }
           },
@@ -1139,7 +1147,8 @@ function renderEditRoutine() {
           h('button', {
             class: 'delete-btn', 'aria-label': 'Delete',
             onclick: () => {
-              const newItems = items.filter(x => x.id !== it.id);
+              const latest = currentItems(m.id, part);
+              const newItems = latest.filter(x => x.id !== it.id);
               updateMemberRoutine(m.id, part, newItems);
             }
           }, '✕')
@@ -1151,7 +1160,8 @@ function renderEditRoutine() {
       class: 'btn btn-ghost btn-full',
       style: 'margin-top: 12px;',
       onclick: () => {
-        const newItems = [...items, { id: uid(), label: 'New item' }];
+        const latest = currentItems(m.id, part);
+        const newItems = [...latest, { id: uid(), label: 'New item' }];
         updateMemberRoutine(m.id, part, newItems);
       }
     }, '+ Add an item')
@@ -1163,6 +1173,24 @@ function updateMemberRoutine(memberId, part, newItems) {
     m.id === memberId ? { ...m, [part]: newItems } : m
   );
   setState({ members: updated });
+}
+
+// Silent variant: updates state and persists to storage, but does NOT re-render.
+// Used by text inputs in the routine editor so the input keeps focus while typing.
+function updateMemberRoutineSilent(memberId, part, newItems) {
+  state = {
+    ...state,
+    members: state.members.map(m =>
+      m.id === memberId ? { ...m, [part]: newItems } : m
+    )
+  };
+  saveState();
+}
+
+// Read the latest items for a member's part from state (not from a stale closure)
+function currentItems(memberId, part) {
+  const m = state.members.find(x => x.id === memberId);
+  return (m && m[part]) || [];
 }
 
 // ────────── Boot ──────────

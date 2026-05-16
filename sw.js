@@ -1,4 +1,4 @@
-const CACHE = 'hearth-v6';
+const CACHE = 'hearth-v7';
 const CORE = [
   './',
   './index.html',
